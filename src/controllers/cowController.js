@@ -4,10 +4,6 @@ import { buildQuery } from "../utils/helpers.js";
 
 export const createCow = async (req, res) => {
 	try {
-		// Only admins are allowed to create cows
-		if (req.auth.role !== "admin") {
-			return res.status(403).json({ error: "Forbidden: Admins only" });
-		}
 		const cow = new Cow(req.body);
 		await cow.save();
 		res.status(201).json({ data: cow });
@@ -52,9 +48,6 @@ export const getCowById = async (req, res) => {
 
 export const updateCow = async (req, res) => {
 	try {
-		if (req.auth.role !== "admin") {
-			return res.status(403).json({ error: "Forbidden: Admins only" });
-		}
 		const cow = await Cow.findByIdAndUpdate(req.params.id, req.body, {
 			new: true,
 		});
@@ -67,9 +60,6 @@ export const updateCow = async (req, res) => {
 
 export const deleteCow = async (req, res) => {
 	try {
-		if (req.auth.role !== "admin") {
-			return res.status(403).json({ error: "Forbidden: Admins only" });
-		}
 		const cow = await Cow.findByIdAndDelete(req.params.id);
 		if (!cow) return res.status(404).json({ error: "Cow not found" });
 		res.json({ message: "Cow deleted successfully" });
