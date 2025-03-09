@@ -1,6 +1,7 @@
 // src/controllers/donationController.js
 import Donation from "../models/Donation.js";
 import { sendEmail } from "../utils/helpers.js";
+import User from "../models/User.js";
 
 export const createDonation = async (req, res) => {
 	try {
@@ -37,8 +38,18 @@ export const createDonation = async (req, res) => {
 
 export const getDonationHistory = async (req, res) => {
 	try {
-		const userId = req.auth.data.id;
-		const donations = await Donation.find({ user: userId }).sort({
+		const { email } = req.body;
+		if (!email) {
+			logger.warn("Donation: Email missing.");
+			return sendResponse(res, 400, false, null, "Email is required");
+		}
+
+		const user = await User.findOne({ email });
+		if (!user) {
+			logger.warn(`Donation: User not found for email ${email}`);
+			return sendResponse(res, 400, false, null, "User not found");
+		}
+		const donations = await Donation.find({ user: user }).sort({
 			createdAt: -1,
 		});
 		res.json({ data: donations });
@@ -49,9 +60,6 @@ export const getDonationHistory = async (req, res) => {
 
 export const getAllDonations = async (req, res) => {
 	try {
-		if (req.auth.role !== "admin") {
-			return res.status(403).json({ error: "Forbidden: Admins only" });
-		}
 		const donations = await Donation.find().sort({ createdAt: -1 });
 		res.json({ data: donations });
 	} catch (error) {
