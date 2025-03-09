@@ -4,7 +4,7 @@ const CowSchema = new mongoose.Schema(
 	{
 		name: { type: String, required: true },
 		photo: { type: String },
-		description: { type: String }, // New field added instead of age
+		description: { type: String },
 		sicknessStatus: { type: Boolean, default: false },
 		gender: { type: String},
 		agedStatus: { type: Boolean, default: false },

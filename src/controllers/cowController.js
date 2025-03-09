@@ -1,5 +1,4 @@
 import Cow from "../models/Cow.js";
-import { buildQuery } from "../utils/helpers.js";
 
 /**
  * Create Cow(s)
@@ -8,7 +7,6 @@ import { buildQuery } from "../utils/helpers.js";
  */
 export const createCow = async (req, res) => {
 	try {
-		// Check if req.body is an array for bulk creation
 		if (Array.isArray(req.body)) {
 			// Bulk creation using insertMany
 			const cows = await Cow.insertMany(req.body);
@@ -30,19 +28,39 @@ export const createCow = async (req, res) => {
  * - page: Page number (default: 1)
  * - limit: Items per page (default: 20)
  * - sort: Field to sort by (default: "name")
- * - name: (optional) to search cows by name (case-insensitive)
+ * - name: (optional) Search cows by name (case-insensitive)
  * - sick: (optional) "true" or "false" to filter by sicknessStatus
  * - old: (optional) "true" or "false" to filter by agedStatus
  * - adopted: (optional) "true" or "false" to filter by adoptionStatus
+ * - gender: (optional) "Male" or "Female" to filter by gender
  */
 export const getCows = async (req, res) => {
 	try {
 		const page = parseInt(req.query.page) || 1;
 		const limit = parseInt(req.query.limit) || 20;
 		const sort = req.query.sort || "name";
-		const filter = buildQuery(req.query);
-
 		const skip = (page - 1) * limit;
+
+		// Constructing search and filter query
+		let filter = {};
+
+		if (req.query.name) {
+			filter.name = { $regex: req.query.name, $options: "i" };
+		}
+		if (req.query.sick) {
+			filter.sicknessStatus = req.query.sick === "true";
+		}
+		if (req.query.old) {
+			filter.agedStatus = req.query.old === "true";
+		}
+		if (req.query.adopted) {
+			filter.adoptionStatus = req.query.adopted === "true";
+		}
+		if (req.query.gender) {
+			filter.gender = req.query.gender;
+		}
+
+		// Fetch total count
 		const total = await Cow.countDocuments(filter);
 		const cows = await Cow.find(filter).sort(sort).skip(skip).limit(limit);
 
