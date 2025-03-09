@@ -1,11 +1,10 @@
-// src/models/Cow.js
 import mongoose from "mongoose";
 
 const CowSchema = new mongoose.Schema(
 	{
 		name: { type: String, required: true },
 		photo: { type: String },
-		age: { type: Number, required: true },
+		description: { type: String }, // New field added instead of age
 		sicknessStatus: { type: Boolean, default: false },
 		agedStatus: { type: Boolean, default: false },
 		adoptionStatus: { type: Boolean, default: false },
