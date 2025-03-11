@@ -89,11 +89,6 @@ export const createCow = async (req, res) => {
  */
 export const getCows = async (req, res) => {
 	try {
-		const page = parseInt(req.query.page) || 1;
-		const limit = parseInt(req.query.limit) || 20;
-		const sort = req.query.sort || "name";
-		const skip = (page - 1) * limit;
-
 		// Constructing search and filter query
 		let filter = {};
 
@@ -113,18 +108,12 @@ export const getCows = async (req, res) => {
 			filter.gender = req.query.gender;
 		}
 
-		// Fetch total count
-		const total = await Cow.countDocuments(filter);
-		const cows = await Cow.find(filter).sort(sort).skip(skip).limit(limit);
+		const sort = req.query.sort || "name";
 
-		return res.json({
-			data: cows,
-			pagination: {
-				total,
-				page,
-				pages: Math.ceil(total / limit),
-			},
-		});
+		// Fetch all cows that match the filter and sort them
+		const cows = await Cow.find(filter).sort(sort);
+
+		return res.json({ data: cows });
 	} catch (error) {
 		return res.status(500).json({ error: error.message });
 	}
