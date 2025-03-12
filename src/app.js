@@ -23,13 +23,13 @@ const app = express();
 
 // Set up basic configuration with defaults:
 // CLIENT_PORT for client origin, and API_VERSION for route versioning.
-const CLIENT_PORT = process.env.CLIENT_PORT || 8000;
+
 const API_VERSION = process.env.API_VERSION || "1";
 
 // Enable CORS for requests from the client origin, allowing credentials.
 app.use(
 	cors({
-		origin: `http://localhost:${CLIENT_PORT}`,
+		origin: `${process.env.CLIENT_URL}`,
 		credentials: true,
 	})
 );
