@@ -27,9 +27,18 @@ const app = express();
 const API_VERSION = process.env.API_VERSION || "1";
 
 // Enable CORS for requests from the client origin, allowing credentials.
+const allowedOrigins = process.env.CLIENT_URL.split(',').map(url => url.trim());
 app.use(
 	cors({
-		origin: `${process.env.CLIENT_URL}`,
+		origin: function (origin, callback) {
+			// Allow requests with no origin (like mobile apps or curl)
+			if (!origin) return callback(null, true);
+			if (allowedOrigins.indexOf(origin) !== -1) {
+				return callback(null, true);
+			} else {
+				return callback(new Error('Not allowed by CORS'), false);
+			}
+		},
 		credentials: true,
 	})
 );
